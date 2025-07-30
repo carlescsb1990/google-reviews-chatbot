@@ -335,7 +335,65 @@ const ReviewsPageNew: React.FC = () => {
                     </span>
                   )}
                 </div>
-                
+
+                {reviews.length === 0 && canUseGoogleAPI && (
+                  <div className="welcome-message">
+                    <div className="welcome-icon">
+                      <i className="fas fa-rocket"></i>
+                    </div>
+                    <h3>¡Todo listo para empezar! 🎉</h3>
+                    <p>
+                      Sus APIs están configuradas correctamente.
+                      Haga clic en "Cargar Reseñas de Google" para obtener sus reseñas reales.
+                    </p>
+                    <div className="next-steps">
+                      <div className="next-step">
+                        <i className="fas fa-1"></i>
+                        <span>Cargar reseñas de su negocio</span>
+                      </div>
+                      <div className="next-step">
+                        <i className="fas fa-2"></i>
+                        <span>Generar respuestas inteligentes con IA</span>
+                      </div>
+                      <div className="next-step">
+                        <i className="fas fa-3"></i>
+                        <span>Copiar y responder en Google My Business</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {reviews.length === 0 && !canUseGoogleAPI && (
+                  <div className="no-config-message">
+                    <div className="no-config-icon">
+                      <i className="fas fa-cog"></i>
+                    </div>
+                    <h3>Configure las APIs para comenzar</h3>
+                    <p>
+                      Complete la configuración anterior para conectar con Google My Business
+                      y empezar a gestionar sus reseñas con inteligencia artificial.
+                    </p>
+                    <div className="benefits-grid">
+                      <div className="benefit-item">
+                        <i className="fas fa-star"></i>
+                        <span>Reseñas reales de Google</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-robot"></i>
+                        <span>Respuestas automáticas con IA</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-chart-line"></i>
+                        <span>Análisis de sentimientos</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-zap"></i>
+                        <span>Ahorro de tiempo</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="reviews-list">
                   {reviews.map((review) => (
                     <div key={review.id} className="review-item">
@@ -580,6 +638,121 @@ const ReviewsPageNew: React.FC = () => {
 
           .config-item a:hover {
             text-decoration: underline;
+          }
+
+          .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.1) 0%, rgba(0, 206, 201, 0.1) 100%);
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px dashed rgba(0, 184, 148, 0.3);
+          }
+
+          .welcome-icon {
+            font-size: 3rem;
+            color: #00b894;
+            margin-bottom: 20px;
+          }
+
+          .welcome-message h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+          }
+
+          .welcome-message p {
+            color: #636e72;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+          }
+
+          .next-steps {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+          }
+
+          .next-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #2d3436;
+            min-width: 200px;
+          }
+
+          .next-step i {
+            background: #00b894;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+          }
+
+          .no-config-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(149, 165, 166, 0.1) 0%, rgba(127, 140, 141, 0.1) 100%);
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px dashed rgba(149, 165, 166, 0.3);
+          }
+
+          .no-config-icon {
+            font-size: 3rem;
+            color: #95a5a6;
+            margin-bottom: 20px;
+          }
+
+          .no-config-message h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+          }
+
+          .no-config-message p {
+            color: #636e72;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+          }
+
+          .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+          }
+
+          .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #2d3436;
+          }
+
+          .benefit-item i {
+            color: #667eea;
+            font-size: 1.1rem;
           }
 
           .config-content {
@@ -923,6 +1096,31 @@ const ReviewsPageNew: React.FC = () => {
 
             .config-status {
               grid-template-columns: 1fr;
+            }
+
+            .next-steps {
+              flex-direction: column;
+              gap: 10px;
+            }
+
+            .next-step {
+              min-width: auto;
+            }
+
+            .benefits-grid {
+              grid-template-columns: 1fr;
+            }
+
+            .priority-section h4 {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 5px;
+            }
+
+            .quick-start-tip {
+              flex-direction: column;
+              text-align: center;
+              gap: 5px;
             }
           }
         `}</style>
