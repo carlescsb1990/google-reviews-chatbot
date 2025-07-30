@@ -22,6 +22,14 @@ const EndpointsCard: React.FC = () => {
       buttonStyle: 'secondary'
     },
     {
+      path: '/docs',
+      method: 'GET',
+      description: 'Documentación completa',
+      color: '#e17055',
+      icon: 'fas fa-book',
+      buttonStyle: 'docs'
+    },
+    {
       path: '/health',
       method: 'GET',
       description: 'Estado del sistema',
