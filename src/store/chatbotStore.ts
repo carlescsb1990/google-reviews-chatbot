@@ -156,25 +156,48 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
     set({ config })
   },
   
-  generateResponse: async (userInput: string): Promise<AIResponse> => {
+  generateResponse: async (userInput: string, useRealAPI: boolean = false): Promise<AIResponse> => {
     set({ loading: true, error: null })
-    
+
     try {
-      // Simular delay de API
+      const config = get().config
+
+      // Intentar usar API real si está configurada y se solicita
+      if (useRealAPI && config.openai.isConfigured) {
+        try {
+          const response = await openaiService.generateResponse(userInput)
+
+          const aiResponse: AIResponse = {
+            response,
+            status: 'ai_generated',
+            timestamp: new Date().toISOString(),
+            note: 'Respuesta generada por OpenAI GPT-3.5'
+          }
+
+          set({ loading: false })
+          return aiResponse
+        } catch (apiError) {
+          console.error('Real API failed, falling back to mock:', apiError)
+          // Continuar con respuesta mock si falla la API real
+        }
+      }
+
+      // Usar respuesta mock como fallback
       await new Promise(resolve => setTimeout(resolve, 1500))
-      
       const response = generateMockResponse(userInput)
-      
+
       const aiResponse: AIResponse = {
         response,
         status: 'mock',
         timestamp: new Date().toISOString(),
-        note: 'Esto es una respuesta simulada. La IA real requiere configuración de OpenAI.'
+        note: config.openai.isConfigured
+          ? 'API real disponible pero usando modo demo'
+          : 'Respuesta simulada. Configure VITE_OPENAI_API_KEY para usar IA real.'
       }
-      
+
       set({ loading: false })
       return aiResponse
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
       set({ error: errorMessage, loading: false })
