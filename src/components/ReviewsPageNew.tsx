@@ -20,18 +20,27 @@ const ReviewsPageNew: React.FC = () => {
   const [generatedResponse, setGeneratedResponse] = useState<string>('')
   const [responseLoading, setResponseLoading] = useState(false)
   const [showConfigHelp, setShowConfigHelp] = useState(false)
+  const [localError, setLocalError] = useState<string | null>(null)
 
   useEffect(() => {
     refreshConfig()
-    loadReviews()
+    // Don't automatically load reviews - let user click the button when ready
   }, [])
 
   const loadReviews = async () => {
+    if (!canUseGoogleAPI) {
+      setLocalError('Google My Business API no está configurada. Configure las credenciales primero.')
+      return
+    }
+
     try {
       const data = await fetchReviews(true)
       setReviews(data)
+      setLocalError(null) // Clear any previous errors
     } catch (error) {
       console.error('Error loading reviews:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar reseñas'
+      setLocalError(errorMessage)
     }
   }
 
@@ -180,6 +189,23 @@ const ReviewsPageNew: React.FC = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {localError && (
+          <div className="card error-card">
+            <div className="error-header">
+              <i className="fas fa-exclamation-triangle"></i>
+              <h3>Error</h3>
+            </div>
+            <p>{localError}</p>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setLocalError(null)}
+            >
+              <i className="fas fa-times"></i>
+              Cerrar
+            </button>
           </div>
         )}
 
@@ -694,6 +720,29 @@ const ReviewsPageNew: React.FC = () => {
           .page-footer {
             text-align: center;
             margin-top: 30px;
+          }
+
+          .error-card {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            margin-bottom: 20px;
+          }
+
+          .error-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+          }
+
+          .error-header h3 {
+            margin: 0;
+            color: #e74c3c;
+          }
+
+          .error-header i {
+            font-size: 1.2rem;
           }
 
           @media (max-width: 768px) {
