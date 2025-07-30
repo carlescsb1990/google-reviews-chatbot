@@ -93,7 +93,8 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
       const config = get().config
 
       // Solo usar API real - sin fallbacks mock
-      if (!config.apis.openai.isConfigured) {
+      const openaiConfig = config.apis?.openai || config.openai
+      if (!openaiConfig?.isConfigured) {
         throw new Error('OpenAI API no configurada. Configure VITE_OPENAI_API_KEY para usar IA real.')
       }
 
@@ -123,7 +124,8 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
       const config = get().config
 
       // Solo usar API real - sin fallbacks mock
-      if (!config.apis.google.isFullyConfigured) {
+      const googleConfig = config.apis?.google || config.google
+      if (!googleConfig?.isFullyConfigured) {
         throw new Error('Google My Business API no configurada completamente. Configure las credenciales y complete la autenticación OAuth.')
       }
 
@@ -192,8 +194,8 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
         features: {
           web_interface: true,
           responsive_design: true,
-          real_api_integration: config.apis.google.isFullyConfigured && config.apis.openai.isConfigured,
-          backend_integration: config.backend.isConfigured,
+          real_api_integration: (config.apis?.google?.isFullyConfigured || config.google?.isFullyConfigured) && (config.apis?.openai?.isConfigured || config.openai?.isConfigured),
+          backend_integration: config.backend?.isConfigured || false,
           real_time_ui: true,
           modern_architecture: true
         },
