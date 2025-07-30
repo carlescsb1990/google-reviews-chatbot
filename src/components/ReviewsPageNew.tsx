@@ -83,8 +83,10 @@ const ReviewsPageNew: React.FC = () => {
     return '#e17055'
   }
 
-  const canUseGoogleAPI = config.apis.google.isFullyConfigured
-  const canUseOpenAI = config.apis.openai.isConfigured
+  const googleConfig = config.apis?.google || config.google
+  const openaiConfig = config.apis?.openai || config.openai
+  const canUseGoogleAPI = googleConfig?.isFullyConfigured || false
+  const canUseOpenAI = openaiConfig?.isConfigured || false
   const canUseRealAPIs = canUseGoogleAPI && canUseOpenAI
 
   return (
@@ -108,7 +110,7 @@ const ReviewsPageNew: React.FC = () => {
         </div>
 
         {/* Panel de configuración */}
-        {config.missingConfiguration.length > 0 && (
+        {(config.missingConfiguration?.length || config.missingSteps?.length || 0) > 0 && (
           <div className="config-panel">
             <div className="config-header">
               <div className="config-title">
@@ -121,7 +123,7 @@ const ReviewsPageNew: React.FC = () => {
                   <i className={`fas ${showConfigHelp ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
                 </button>
               </div>
-              <p>Faltan {config.missingConfiguration.length} pasos para usar APIs reales</p>
+              <p>Faltan {config.missingConfiguration?.length || config.missingSteps?.length || 0} pasos para usar APIs reales</p>
             </div>
 
             {showConfigHelp && (
@@ -133,24 +135,24 @@ const ReviewsPageNew: React.FC = () => {
                       Google My Business API
                     </h4>
                     <div className="config-items">
-                      <div className={`config-item ${config.apis.google.hasApiKey ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.apis.google.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${googleConfig?.hasApiKey ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${googleConfig?.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
                         <span>API Key</span>
-                        {!config.apis.google.hasApiKey && (
+                        {!googleConfig?.hasApiKey && (
                           <small>Configure VITE_GOOGLE_API_KEY</small>
                         )}
                       </div>
-                      <div className={`config-item ${config.apis.google.hasClientId ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.apis.google.hasClientId ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${googleConfig?.hasClientId ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${googleConfig?.hasClientId ? 'fa-check' : 'fa-times'}`}></i>
                         <span>Client ID</span>
-                        {!config.apis.google.hasClientId && (
+                        {!googleConfig?.hasClientId && (
                           <small>Configure VITE_GOOGLE_CLIENT_ID</small>
                         )}
                       </div>
-                      <div className={`config-item ${config.apis.google.hasAccessToken ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.apis.google.hasAccessToken ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${googleConfig?.hasAccessToken ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${googleConfig?.hasAccessToken ? 'fa-check' : 'fa-times'}`}></i>
                         <span>Authentication</span>
-                        {!config.apis.google.hasAccessToken && config.apis.google.hasClientId && (
+                        {!googleConfig?.hasAccessToken && googleConfig?.hasClientId && (
                           <button className="auth-button" onClick={handleGoogleAuth}>
                             <i className="fab fa-google"></i>
                             Autenticar con Google
@@ -166,10 +168,10 @@ const ReviewsPageNew: React.FC = () => {
                       OpenAI API
                     </h4>
                     <div className="config-items">
-                      <div className={`config-item ${config.apis.openai.hasApiKey ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.apis.openai.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${openaiConfig?.hasApiKey ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${openaiConfig?.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
                         <span>API Key</span>
-                        {!config.apis.openai.hasApiKey && (
+                        {!openaiConfig?.hasApiKey && (
                           <small>Configure VITE_OPENAI_API_KEY</small>
                         )}
                       </div>
