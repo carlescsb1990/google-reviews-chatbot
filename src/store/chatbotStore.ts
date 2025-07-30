@@ -53,10 +53,14 @@ interface ChatbotState {
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   setReviews: (reviews: Review[]) => void
-  generateResponse: (userInput: string) => Promise<AIResponse>
-  fetchReviews: () => Promise<Review[]>
+  refreshConfig: () => void
+  generateResponse: (userInput: string, useRealAPI?: boolean) => Promise<AIResponse>
+  fetchReviews: (useRealAPI?: boolean) => Promise<Review[]>
   checkHealth: () => Promise<any>
   getApiStatus: () => Promise<any>
+  initiateGoogleAuth: () => Promise<string>
+  setGoogleToken: (token: string) => void
+  signOutGoogle: () => void
 }
 
 // Simulación de la API
