@@ -205,18 +205,52 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
     }
   },
   
-  fetchReviews: async (): Promise<Review[]> => {
+  fetchReviews: async (useRealAPI: boolean = false): Promise<Review[]> => {
     set({ loading: true, error: null })
-    
+
     try {
-      // Simular delay de API
+      const config = get().config
+
+      // Intentar usar API real si está configurada y se solicita
+      if (useRealAPI && config.google.isFullyConfigured) {
+        try {
+          const googleReviews = await googleService.getReviews()
+
+          // Convertir formato de Google a formato interno
+          const reviews: Review[] = googleReviews.map((review, index) => ({
+            id: review.reviewId || `google_${index}`,
+            reviewer: review.reviewer.displayName || 'Usuario Anónimo',
+            rating: convertGoogleRating(review.starRating),
+            text: review.comment || 'Sin comentario',
+            date: formatDate(review.createTime),
+            originalData: review
+          }))
+
+          set({ reviews, loading: false, isUsingRealData: true })
+          return reviews
+
+        } catch (apiError) {
+          console.error('Google API failed, falling back to mock data:', apiError)
+          // Continuar con datos mock si falla la API real
+        }
+      }
+
+      // Usar datos mock como fallback
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // En una app real, aquí harías la llamada a la API
-      const reviews = mockReviews
-      set({ reviews, loading: false })
+      const googleReviews = MockDataService.getMockReviews()
+
+      const reviews: Review[] = googleReviews.map((review, index) => ({
+        id: review.reviewId || `mock_${index}`,
+        reviewer: review.reviewer.displayName || 'Usuario Anónimo',
+        rating: convertGoogleRating(review.starRating),
+        text: review.comment || 'Sin comentario',
+        date: formatDate(review.createTime),
+        originalData: review
+      }))
+
+      set({ reviews, loading: false, isUsingRealData: false })
       return reviews
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al obtener reseñas'
       set({ error: errorMessage, loading: false })
