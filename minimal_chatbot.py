@@ -809,5 +809,5 @@ def run_server(port=3000):
         print(f"Error starting server: {e}")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 3000))
+    port = int(os.environ.get('PORT', 3001))
     run_server(port)
