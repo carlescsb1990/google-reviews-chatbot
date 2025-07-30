@@ -141,12 +141,8 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
   loading: false,
   error: null,
   reviews: [],
-  config: {
-    googleConfigured: false,
-    openaiConfigured: false,
-    celeryAvailable: false,
-    flaskAvailable: true // Como es una app web, siempre está disponible
-  },
+  isUsingRealData: false,
+  config: MockDataService.getConfigurationGaps(),
   
   // Acciones
   setLoading: (loading) => set({ loading }),
