@@ -176,11 +176,51 @@ npm run build
 ### Variables de Entorno
 
 ```bash
-# .env.local
-VITE_API_URL=https://api.tu-servidor.com
-VITE_GOOGLE_API_KEY=tu_clave_api
-VITE_OPENAI_API_KEY=tu_clave_openai
+# Copia .env.example como .env.local y configura:
+
+# Google My Business API
+VITE_GOOGLE_API_KEY=your_google_api_key_here
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# OpenAI API
+VITE_OPENAI_API_KEY=sk-your_openai_api_key_here
+
+# Configuración de desarrollo
+VITE_APP_ENV=development
 ```
+
+### Configuración de APIs Reales
+
+La aplicación funciona en **modo demo** por defecto, pero puedes conectar APIs reales:
+
+#### 🔧 Configuración Paso a Paso
+
+1. **Copia el archivo de configuración:**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Configura Google My Business API:**
+   - Ve a [Google Cloud Console](https://console.cloud.google.com/)
+   - Crea un proyecto y habilita "Google My Business API"
+   - Crea credenciales OAuth 2.0
+   - Solicita acceso: [Formulario GMB](https://docs.google.com/forms/d/e/1FAIpQLSfC_FKSWzbSae_5rOpgwFeIUzXUF1JCQnlsZM_gC1I2UHjA3w/viewform)
+
+3. **Configura OpenAI API:**
+   - Ve a [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Crea una cuenta y obtén tu API key
+   - Configura método de pago si es necesario
+
+4. **Reinicia el servidor:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Prueba la configuración:**
+   - Ve a `/reviews` en la aplicación
+   - La página te mostrará qué configuración falta
+   - Usa los botones "Datos Reales" cuando esté configurado
 
 ## 🔮 Roadmap
 
