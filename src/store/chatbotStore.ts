@@ -7,30 +7,47 @@ export interface Review {
   rating: number
   text: string
   date: string
+  originalData?: GoogleReview // Datos originales de Google
 }
 
 export interface AIResponse {
   response: string
-  status: 'ai_generated' | 'mock'
+  status: 'ai_generated' | 'mock' | 'error'
   timestamp: string
   note?: string
+  usage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+}
+
+export interface ConfigurationStatus {
+  google: {
+    hasApiKey: boolean
+    hasClientId: boolean
+    hasClientSecret: boolean
+    hasAccessToken: boolean
+    isFullyConfigured: boolean
+  }
+  openai: {
+    hasApiKey: boolean
+    isConfigured: boolean
+  }
+  missingSteps: string[]
 }
 
 interface ChatbotState {
   // Estado de la aplicación
   loading: boolean
   error: string | null
-  
+
   // Reseñas
   reviews: Review[]
-  
+  isUsingRealData: boolean
+
   // Configuración
-  config: {
-    googleConfigured: boolean
-    openaiConfigured: boolean
-    celeryAvailable: boolean
-    flaskAvailable: boolean
-  }
+  config: ConfigurationStatus
   
   // Acciones
   setLoading: (loading: boolean) => void
