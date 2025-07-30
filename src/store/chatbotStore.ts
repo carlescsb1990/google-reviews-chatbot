@@ -146,10 +146,15 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
   
   // Acciones
   setLoading: (loading) => set({ loading }),
-  
+
   setError: (error) => set({ error }),
-  
+
   setReviews: (reviews) => set({ reviews }),
+
+  refreshConfig: () => {
+    const config = MockDataService.getConfigurationGaps()
+    set({ config })
+  },
   
   generateResponse: async (userInput: string): Promise<AIResponse> => {
     set({ loading: true, error: null })
