@@ -19,7 +19,7 @@ const ReviewsPageNew: React.FC = () => {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [generatedResponse, setGeneratedResponse] = useState<string>('')
   const [responseLoading, setResponseLoading] = useState(false)
-  const [showConfigHelp, setShowConfigHelp] = useState(false)
+  const [showConfigHelp, setShowConfigHelp] = useState(true)
   const [localError, setLocalError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -100,64 +100,90 @@ const ReviewsPageNew: React.FC = () => {
           </h1>
           <p>Gestión y análisis de reseñas de Google My Business</p>
           
-          {/* Indicador de modo */}
-          <div className="mode-indicator">
-            <span className={`mode-badge ${isUsingRealData ? 'real' : 'demo'}`}>
-              <i className={`fas ${isUsingRealData ? 'fa-cloud' : 'fa-flask'}`}></i>
-              {isUsingRealData ? 'Datos Reales' : 'Modo Demo'}
-            </span>
-          </div>
+          {/* Indicador de modo - solo mostrar si hay configuración */}
+          {canUseRealAPIs && (
+            <div className="mode-indicator">
+              <span className={`mode-badge ${isUsingRealData ? 'real' : 'ready'}`}>
+                <i className={`fas ${isUsingRealData ? 'fa-cloud' : 'fa-check-circle'}`}></i>
+                {isUsingRealData ? 'Datos Reales' : 'APIs Configuradas'}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Panel de configuración */}
+        {/* Panel de configuración y Getting Started */}
         {(config.missingConfiguration?.length || config.missingSteps?.length || 0) > 0 && (
           <div className="config-panel">
             <div className="config-header">
               <div className="config-title">
-                <i className="fas fa-cog"></i>
-                <span>Configuración Requerida</span>
-                <button 
+                <i className="fas fa-rocket"></i>
+                <span>¡Comencemos! - Configuración Inicial</span>
+                <button
                   className="toggle-help"
                   onClick={() => setShowConfigHelp(!showConfigHelp)}
                 >
                   <i className={`fas ${showConfigHelp ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
                 </button>
               </div>
-              <p>Faltan {config.missingConfiguration?.length || config.missingSteps?.length || 0} pasos para usar APIs reales</p>
+              <p>
+                <strong>Faltan {config.missingConfiguration?.length || config.missingSteps?.length || 0} pasos</strong> para conectar con sus reseñas reales de Google My Business
+              </p>
+              <div className="quick-start-tip">
+                <i className="fas fa-lightbulb"></i>
+                <span>Proceso típico: 5-10 minutos • Completamente gratuito para empezar</span>
+              </div>
             </div>
 
             {showConfigHelp && (
               <div className="config-content">
                 <div className="config-status">
-                  <div className="config-section">
+                  <div className="config-section priority-section">
                     <h4>
                       <i className="fab fa-google"></i>
                       Google My Business API
+                      <span className="priority-badge high">PASO 1 - OBLIGATORIO</span>
                     </h4>
                     <div className="config-items">
                       <div className={`config-item ${googleConfig?.hasApiKey ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${googleConfig?.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
-                        <span>API Key</span>
-                        {!googleConfig?.hasApiKey && (
-                          <small>Configure VITE_GOOGLE_API_KEY</small>
-                        )}
+                        <i className={`fas ${googleConfig?.hasApiKey ? 'fa-check' : 'fa-circle'}`}></i>
+                        <div className="config-item-content">
+                          <span>API Key de Google Cloud</span>
+                          {!googleConfig?.hasApiKey && (
+                            <small>
+                              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">
+                                📋 Obtener en Google Cloud Console
+                              </a>
+                            </small>
+                          )}
+                        </div>
                       </div>
                       <div className={`config-item ${googleConfig?.hasClientId ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${googleConfig?.hasClientId ? 'fa-check' : 'fa-times'}`}></i>
-                        <span>Client ID</span>
-                        {!googleConfig?.hasClientId && (
-                          <small>Configure VITE_GOOGLE_CLIENT_ID</small>
-                        )}
+                        <i className={`fas ${googleConfig?.hasClientId ? 'fa-check' : 'fa-circle'}`}></i>
+                        <div className="config-item-content">
+                          <span>OAuth Client ID</span>
+                          {!googleConfig?.hasClientId && (
+                            <small>
+                              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">
+                                🔑 Crear credenciales OAuth 2.0
+                              </a>
+                            </small>
+                          )}
+                        </div>
                       </div>
                       <div className={`config-item ${googleConfig?.hasAccessToken ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${googleConfig?.hasAccessToken ? 'fa-check' : 'fa-times'}`}></i>
-                        <span>Authentication</span>
-                        {!googleConfig?.hasAccessToken && googleConfig?.hasClientId && (
-                          <button className="auth-button" onClick={handleGoogleAuth}>
-                            <i className="fab fa-google"></i>
-                            Autenticar con Google
-                          </button>
-                        )}
+                        <i className={`fas ${googleConfig?.hasAccessToken ? 'fa-check' : 'fa-circle'}`}></i>
+                        <div className="config-item-content">
+                          <span>Autenticación OAuth</span>
+                          {!googleConfig?.hasAccessToken && googleConfig?.hasClientId && (
+                            <button className="auth-button" onClick={handleGoogleAuth}>
+                              <i className="fab fa-google"></i>
+                              🚀 Conectar con Google
+                            </button>
+                          )}
+                          {!googleConfig?.hasAccessToken && !googleConfig?.hasClientId && (
+                            <small>Complete los pasos anteriores primero</small>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -165,15 +191,27 @@ const ReviewsPageNew: React.FC = () => {
                   <div className="config-section">
                     <h4>
                       <i className="fas fa-brain"></i>
-                      OpenAI API
+                      OpenAI API (GPT)
+                      <span className="priority-badge medium">PASO 2 - IA RESPONSES</span>
                     </h4>
                     <div className="config-items">
                       <div className={`config-item ${openaiConfig?.hasApiKey ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${openaiConfig?.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
-                        <span>API Key</span>
-                        {!openaiConfig?.hasApiKey && (
-                          <small>Configure VITE_OPENAI_API_KEY</small>
-                        )}
+                        <i className={`fas ${openaiConfig?.hasApiKey ? 'fa-check' : 'fa-circle'}`}></i>
+                        <div className="config-item-content">
+                          <span>API Key de OpenAI</span>
+                          {!openaiConfig?.hasApiKey && (
+                            <div className="config-item-details">
+                              <small>
+                                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">
+                                  🤖 Obtener clave en OpenAI Platform
+                                </a>
+                              </small>
+                              <small className="cost-info">
+                                💰 Costo: ~$0.001 por respuesta generada
+                              </small>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -223,8 +261,14 @@ const ReviewsPageNew: React.FC = () => {
               <div className="card-title">
                 <i className="fas fa-chart-bar"></i>
                 Estadísticas de Reseñas
+                {reviews.length === 0 && (
+                  <span className="empty-state-hint">
+                    <i className="fas fa-info-circle"></i>
+                    Configure las APIs para ver estadísticas
+                  </span>
+                )}
               </div>
-              
+
               <div className="stats-grid">
                 <div className="stat-item">
                   <div className="stat-value">{reviews.length}</div>
@@ -241,6 +285,15 @@ const ReviewsPageNew: React.FC = () => {
                   <div className="stat-label">Positivas</div>
                 </div>
               </div>
+
+              {reviews.length === 0 && !canUseGoogleAPI && (
+                <div className="empty-state-message">
+                  <p>
+                    <i className="fas fa-arrow-up"></i>
+                    Configure Google My Business API arriba para comenzar a cargar sus reseñas reales
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Controles */}
@@ -391,8 +444,8 @@ const ReviewsPageNew: React.FC = () => {
           }
 
           .config-panel {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.3);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 12px;
             margin-bottom: 30px;
             overflow: hidden;
@@ -400,7 +453,7 @@ const ReviewsPageNew: React.FC = () => {
 
           .config-header {
             padding: 20px;
-            background: rgba(255, 107, 107, 0.05);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
           }
 
           .config-title {
@@ -408,7 +461,7 @@ const ReviewsPageNew: React.FC = () => {
             align-items: center;
             gap: 10px;
             margin-bottom: 8px;
-            color: #e74c3c;
+            color: #667eea;
             font-weight: 600;
             font-size: 1.1rem;
           }
@@ -416,7 +469,7 @@ const ReviewsPageNew: React.FC = () => {
           .toggle-help {
             background: none;
             border: none;
-            color: #e74c3c;
+            color: #667eea;
             cursor: pointer;
             margin-left: auto;
             padding: 5px;
@@ -425,7 +478,108 @@ const ReviewsPageNew: React.FC = () => {
           }
 
           .toggle-help:hover {
-            background: rgba(255, 107, 107, 0.1);
+            background: rgba(102, 126, 234, 0.1);
+          }
+
+          .quick-start-tip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #667eea;
+          }
+
+          .empty-state-hint {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+          }
+
+          .empty-state-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-style: italic;
+          }
+
+          .empty-state-message i {
+            color: #667eea;
+            margin-right: 5px;
+          }
+
+          .mode-badge.ready {
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+            border: 1px solid rgba(0, 184, 148, 0.3);
+          }
+
+          .priority-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+          }
+
+          .priority-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+
+          .priority-badge.high {
+            background: #e74c3c;
+            color: white;
+          }
+
+          .priority-badge.medium {
+            background: #f39c12;
+            color: white;
+          }
+
+          .config-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+
+          .config-item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+          }
+
+          .cost-info {
+            color: #f39c12 !important;
+            font-weight: 500;
+          }
+
+          .config-item {
+            align-items: flex-start;
+          }
+
+          .config-item i {
+            margin-top: 2px;
+          }
+
+          .config-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+          }
+
+          .config-item a:hover {
+            text-decoration: underline;
           }
 
           .config-content {
