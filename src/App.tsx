@@ -4,6 +4,7 @@ import ChatbotDashboard from './components/ChatbotDashboard'
 import HealthCheck from './components/HealthCheck'
 import ReviewsPage from './components/ReviewsPage'
 import ApiStatus from './components/ApiStatus'
+import Documentation from './components/Documentation'
 import './App.css'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/health" element={<HealthCheck />} />
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/api/status" element={<ApiStatus />} />
+          <Route path="/docs" element={<Documentation />} />
         </Routes>
       </div>
     </Router>
