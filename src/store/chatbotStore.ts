@@ -24,18 +24,36 @@ export interface AIResponse {
 }
 
 export interface ConfigurationStatus {
-  google: {
+  google?: {
     hasApiKey: boolean
     hasClientId: boolean
     hasClientSecret: boolean
     hasAccessToken: boolean
     isFullyConfigured: boolean
   }
-  openai: {
+  openai?: {
     hasApiKey: boolean
     isConfigured: boolean
   }
-  missingSteps: string[]
+  missingSteps?: string[]
+  // Support for new structure from ConfigurationService
+  apis?: {
+    google?: {
+      hasApiKey: boolean
+      hasClientId: boolean
+      hasClientSecret: boolean
+      hasAccessToken: boolean
+      isFullyConfigured: boolean
+    }
+    openai?: {
+      hasApiKey: boolean
+      isConfigured: boolean
+    }
+  }
+  backend?: {
+    isConfigured: boolean
+  }
+  missingConfiguration?: string[]
 }
 
 interface ChatbotState {
