@@ -16,7 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ChatbotDashboard />} />
           <Route path="/health" element={<HealthCheck />} />
-          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/reviews" element={<ReviewsPageNew />} />
           <Route path="/api/status" element={<ApiStatus />} />
           <Route path="/docs" element={<Documentation />} />
         </Routes>
