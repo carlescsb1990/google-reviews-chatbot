@@ -8,6 +8,7 @@ const GlobalNavigation: React.FC = () => {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: 'fas fa-home' },
     { path: '/reviews', label: 'Reseñas', icon: 'fas fa-star' },
+    { path: '/analytics', label: 'Análisis', icon: 'fas fa-chart-line' },
     { path: '/docs', label: 'Docs', icon: 'fas fa-book' },
     { path: '/health', label: 'Estado', icon: 'fas fa-heartbeat' },
     { path: '/api/status', label: 'API', icon: 'fas fa-server' }
