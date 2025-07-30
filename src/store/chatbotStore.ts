@@ -282,13 +282,16 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
   
   getApiStatus: async () => {
     try {
+      const config = get().config
       return {
         application: 'Google Reviews Chatbot',
         version: '2.0.0 (Web)',
         technology: 'React + Vite + TypeScript',
+        configuration: config,
         features: {
           web_interface: true,
           responsive_design: true,
+          real_api_integration: config.google.isFullyConfigured && config.openai.isConfigured,
           mock_responses: true,
           real_time_ui: true,
           modern_architecture: true
@@ -296,6 +299,7 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
         endpoints: [
           { path: '/', method: 'GET', description: 'Dashboard principal' },
           { path: '/reviews', method: 'GET', description: 'Página de reseñas' },
+          { path: '/docs', method: 'GET', description: 'Documentación' },
           { path: '/health', method: 'GET', description: 'Estado del sistema' },
           { path: '/api/status', method: 'GET', description: 'Estado de la API' }
         ]
@@ -303,5 +307,48 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
     } catch (error) {
       throw error
     }
+  },
+
+  initiateGoogleAuth: async (): Promise<string> => {
+    try {
+      return await googleService.initiateAuth()
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar autenticación'
+      set({ error: errorMessage })
+      throw error
+    }
+  },
+
+  setGoogleToken: (token: string) => {
+    googleService.setAccessToken(token)
+    const config = MockDataService.getConfigurationGaps()
+    set({ config })
+  },
+
+  signOutGoogle: () => {
+    googleService.signOut()
+    const config = MockDataService.getConfigurationGaps()
+    set({ config, reviews: [], isUsingRealData: false })
   }
 }))
+
+// Funciones auxiliares
+function convertGoogleRating(starRating: string): number {
+  const ratingMap: { [key: string]: number } = {
+    'ONE': 1,
+    'TWO': 2,
+    'THREE': 3,
+    'FOUR': 4,
+    'FIVE': 5
+  }
+  return ratingMap[starRating] || 0
+}
+
+function formatDate(dateString: string): string {
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-ES')
+  } catch {
+    return 'Fecha no disponible'
+  }
+}
