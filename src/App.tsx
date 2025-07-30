@@ -5,12 +5,14 @@ import HealthCheck from './components/HealthCheck'
 import ReviewsPage from './components/ReviewsPage'
 import ApiStatus from './components/ApiStatus'
 import Documentation from './components/Documentation'
+import GlobalNavigation from './components/GlobalNavigation'
 import './App.css'
 
 function App() {
   return (
     <Router>
       <div className="app">
+        <GlobalNavigation />
         <Routes>
           <Route path="/" element={<ChatbotDashboard />} />
           <Route path="/health" element={<HealthCheck />} />
