@@ -687,21 +687,42 @@ class ChatbotHandler(BaseHTTPRequestHandler):
             "reviews": [
                 {
                     "id": "1",
-                    "reviewer": "John Doe",
+                    "reviewer": "María García",
                     "rating": 5,
-                    "text": "Excellent service! Very professional and helpful.",
+                    "text": "Excelente servicio! El personal fue muy profesional y amable. Definitivamente volveré y lo recomendaré a mis amigos.",
                     "date": "2025-07-30"
                 },
                 {
-                    "id": "2", 
-                    "reviewer": "Jane Smith",
+                    "id": "2",
+                    "reviewer": "Carlos López",
                     "rating": 4,
-                    "text": "Good experience overall, would recommend.",
+                    "text": "Buena experiencia en general. El servicio fue rápido y eficiente, aunque el precio podría ser un poco mejor.",
                     "date": "2025-07-29"
+                },
+                {
+                    "id": "3",
+                    "reviewer": "John Smith",
+                    "rating": 5,
+                    "text": "Outstanding service! The team went above and beyond my expectations. Highly professional and friendly staff.",
+                    "date": "2025-07-28"
+                },
+                {
+                    "id": "4",
+                    "reviewer": "Ana Martínez",
+                    "rating": 3,
+                    "text": "El servicio estuvo bien, pero tuvieron algunos problemas con mi pedido. Al final lo resolvieron correctamente.",
+                    "date": "2025-07-27"
+                },
+                {
+                    "id": "5",
+                    "reviewer": "Sarah Johnson",
+                    "rating": 5,
+                    "text": "Amazing experience! Everything was perfect from start to finish. Will definitely be back!",
+                    "date": "2025-07-26"
                 }
             ],
             "status": "mock_data",
-            "note": "This is mock data. Real Google My Business integration requires proper API setup and dependencies."
+            "note": "Estos son datos de demostración. La integración real con Google My Business requiere configuración de API adecuada y dependencias."
         }
         
         self.wfile.write(json.dumps(mock_reviews, indent=2).encode())
