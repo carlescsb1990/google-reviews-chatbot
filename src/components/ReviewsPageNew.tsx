@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useChatbotStore, Review, ConfigurationStatus } from '../store/chatbotStore'
+import { oauthService } from '../services/realApiService'
 
 const ReviewsPageNew: React.FC = () => {
   const { 
@@ -25,25 +26,30 @@ const ReviewsPageNew: React.FC = () => {
     loadReviews()
   }, [])
 
-  const loadReviews = async (useRealAPI: boolean = false) => {
+  const loadReviews = async () => {
     try {
-      const data = await fetchReviews(useRealAPI)
+      const data = await fetchReviews(true)
       setReviews(data)
     } catch (error) {
       console.error('Error loading reviews:', error)
     }
   }
 
-  const handleGenerateResponse = async (review: Review, useRealAPI: boolean = false) => {
+  const handleGenerateResponse = async (review: Review) => {
+    if (!canUseOpenAI) {
+      setGeneratedResponse('OpenAI API no configurada. Configure VITE_OPENAI_API_KEY.')
+      return
+    }
+
     setSelectedReview(review)
     setResponseLoading(true)
-    
+
     try {
-      const response = await generateResponse(review.text, useRealAPI)
+      const response = await generateResponse(review.text, true)
       setGeneratedResponse(response.response)
     } catch (error) {
       console.error('Error generating response:', error)
-      setGeneratedResponse('Error al generar respuesta')
+      setGeneratedResponse(error instanceof Error ? error.message : 'Error al generar respuesta')
     } finally {
       setResponseLoading(false)
     }
@@ -51,8 +57,8 @@ const ReviewsPageNew: React.FC = () => {
 
   const handleGoogleAuth = async () => {
     try {
-      const authUrl = await initiateGoogleAuth()
-      window.open(authUrl, '_blank', 'width=500,height=600')
+      const authUrl = await oauthService.initiateOAuth()
+      window.location.href = authUrl
     } catch (error) {
       console.error('Error initiating Google auth:', error)
     }
@@ -68,7 +74,9 @@ const ReviewsPageNew: React.FC = () => {
     return '#e17055'
   }
 
-  const canUseRealAPIs = config.google.isFullyConfigured && config.openai.isConfigured
+  const canUseGoogleAPI = config.apis.google.isFullyConfigured
+  const canUseOpenAI = config.apis.openai.isConfigured
+  const canUseRealAPIs = canUseGoogleAPI && canUseOpenAI
 
   return (
     <div className="app">
@@ -91,7 +99,7 @@ const ReviewsPageNew: React.FC = () => {
         </div>
 
         {/* Panel de configuración */}
-        {config.missingSteps.length > 0 && (
+        {config.missingConfiguration.length > 0 && (
           <div className="config-panel">
             <div className="config-header">
               <div className="config-title">
@@ -104,7 +112,7 @@ const ReviewsPageNew: React.FC = () => {
                   <i className={`fas ${showConfigHelp ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
                 </button>
               </div>
-              <p>Faltan {config.missingSteps.length} pasos para usar APIs reales</p>
+              <p>Faltan {config.missingConfiguration.length} pasos para usar APIs reales</p>
             </div>
 
             {showConfigHelp && (
@@ -116,24 +124,24 @@ const ReviewsPageNew: React.FC = () => {
                       Google My Business API
                     </h4>
                     <div className="config-items">
-                      <div className={`config-item ${config.google.hasApiKey ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.google.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${config.apis.google.hasApiKey ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${config.apis.google.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
                         <span>API Key</span>
-                        {!config.google.hasApiKey && (
+                        {!config.apis.google.hasApiKey && (
                           <small>Configure VITE_GOOGLE_API_KEY</small>
                         )}
                       </div>
-                      <div className={`config-item ${config.google.hasClientId ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.google.hasClientId ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${config.apis.google.hasClientId ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${config.apis.google.hasClientId ? 'fa-check' : 'fa-times'}`}></i>
                         <span>Client ID</span>
-                        {!config.google.hasClientId && (
+                        {!config.apis.google.hasClientId && (
                           <small>Configure VITE_GOOGLE_CLIENT_ID</small>
                         )}
                       </div>
-                      <div className={`config-item ${config.google.hasAccessToken ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.google.hasAccessToken ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${config.apis.google.hasAccessToken ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${config.apis.google.hasAccessToken ? 'fa-check' : 'fa-times'}`}></i>
                         <span>Authentication</span>
-                        {!config.google.hasAccessToken && config.google.hasClientId && (
+                        {!config.apis.google.hasAccessToken && config.apis.google.hasClientId && (
                           <button className="auth-button" onClick={handleGoogleAuth}>
                             <i className="fab fa-google"></i>
                             Autenticar con Google
@@ -149,10 +157,10 @@ const ReviewsPageNew: React.FC = () => {
                       OpenAI API
                     </h4>
                     <div className="config-items">
-                      <div className={`config-item ${config.openai.hasApiKey ? 'configured' : 'missing'}`}>
-                        <i className={`fas ${config.openai.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
+                      <div className={`config-item ${config.apis.openai.hasApiKey ? 'configured' : 'missing'}`}>
+                        <i className={`fas ${config.apis.openai.hasApiKey ? 'fa-check' : 'fa-times'}`}></i>
                         <span>API Key</span>
-                        {!config.openai.hasApiKey && (
+                        {!config.apis.openai.hasApiKey && (
                           <small>Configure VITE_OPENAI_API_KEY</small>
                         )}
                       </div>
@@ -215,30 +223,19 @@ const ReviewsPageNew: React.FC = () => {
               </div>
               
               <div className="controls-content">
-                <button 
-                  className="btn btn-secondary"
-                  onClick={() => loadReviews(false)}
-                  disabled={loading}
-                >
-                  <i className="fas fa-flask"></i>
-                  Cargar Datos Demo
-                </button>
-                
-                {canUseRealAPIs && (
-                  <button 
+                {canUseGoogleAPI ? (
+                  <button
                     className="btn"
-                    onClick={() => loadReviews(true)}
+                    onClick={loadReviews}
                     disabled={loading}
                   >
                     <i className="fas fa-cloud"></i>
-                    Cargar Datos Reales
+                    Cargar Reseñas de Google
                   </button>
-                )}
-                
-                {!canUseRealAPIs && (
+                ) : (
                   <div className="disabled-notice">
                     <i className="fas fa-info-circle"></i>
-                    <span>Configure las APIs para acceder a datos reales</span>
+                    <span>Configure Google My Business API para cargar reseñas</span>
                   </div>
                 )}
               </div>
@@ -286,33 +283,29 @@ const ReviewsPageNew: React.FC = () => {
                       </div>
                       
                       <div className="review-actions">
-                        <button 
-                          className="btn btn-small"
-                          onClick={() => handleGenerateResponse(review, false)}
-                          disabled={responseLoading}
-                        >
-                          {responseLoading && selectedReview?.id === review.id ? (
-                            <>
-                              <div className="loading"></div>
-                              Generando...
-                            </>
-                          ) : (
-                            <>
-                              <i className="fas fa-robot"></i>
-                              Respuesta Demo
-                            </>
-                          )}
-                        </button>
-                        
-                        {config.openai.isConfigured && (
-                          <button 
+                        {canUseOpenAI ? (
+                          <button
                             className="btn btn-small btn-premium"
-                            onClick={() => handleGenerateResponse(review, true)}
+                            onClick={() => handleGenerateResponse(review)}
                             disabled={responseLoading}
                           >
-                            <i className="fas fa-brain"></i>
-                            Respuesta IA Real
+                            {responseLoading && selectedReview?.id === review.id ? (
+                              <>
+                                <div className="loading"></div>
+                                Generando...
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-brain"></i>
+                                Generar Respuesta IA
+                              </>
+                            )}
                           </button>
+                        ) : (
+                          <div className="disabled-notice">
+                            <i className="fas fa-info-circle"></i>
+                            <span>Configure OpenAI API para generar respuestas</span>
+                          </div>
                         )}
                       </div>
                       
